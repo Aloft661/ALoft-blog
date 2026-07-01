@@ -4,13 +4,13 @@ import PublicLayout from "@/layouts/PublicLayout.vue";
 const routes = [
     {
         path: "/",
+        name: "home",
+        component: () => import("@/views/Home/index.vue")
+    },
+    {
+        path: "/",
         component: PublicLayout,
         children: [
-            {
-                path: "",
-                name: "home",
-                component: () => import("@/views/Home/index.vue")
-            },
             {
                 path: "blog",
                 name: "Blog",
