@@ -1,6 +1,6 @@
 <template>
     <div class="public-layout">
-        <header class="site-header">
+        <header class="site-header" :class="headerClass">
             <div class="header-inner">
                 <div class="header-left">
                     <router-link class="site-logo" to="/">ALoft's Blog</router-link>
@@ -18,7 +18,7 @@
                     </nav>
                 </div>
                 <div class="header-right">
-                    <button class="theme-toggle" title="">
+                    <button class="theme-toggle" title="" @click="themeStore.toggleTheme">
                         <svg 
                             v-if="isDark"
                             viewBox="0 0 24 24"
@@ -61,10 +61,18 @@
                 </div>
             </div>
         </header>
-        <Banner />
+        <Banner 
+            :title="bannerData.title" 
+            :desc="bannerData.desc"
+            :coverImage="bannerData.coverImage"
+        />
 
         <main class="site-main">
-            <router-view />
+            <RouterView v-slot="{ Component, route }">
+                <transition name="site-main" mode="out-in">
+                    <Component :is="Component" :key="route.path" />
+                </transition>
+            </RouterView>
         </main>
 
         <footer class="site-footer">
@@ -74,7 +82,31 @@
 </template>
 
 <script setup>
-    import Banner from '../components/Banner.vue';
+    import Banner from '@/components/Banner.vue';
+
+    import { useBlogStore } from "@/stores/blog";
+    import { useThemeStore } from "@/stores/theme";
+    import { storeToRefs } from "pinia";
+    import { useRoute } from "vue-router"
+    import { ref, onMounted, onUnmounted, computed } from "vue";
+
+    const blogStore = useBlogStore();
+    const themeStore = useThemeStore();
+    const { personalInfo } = storeToRefs(blogStore);
+    const { isDark } = storeToRefs(themeStore);
+
+    const route = useRoute();
+    const bannerData = computed(() => {
+        return route.meta.banner || {
+            title: personalInfo.nickname,
+            desc: "四处逛逛，发现一些新的大陆——特别的想法、新的感触和一段不一样的经历"
+        }
+    });
+
+    const isScrolled = ref(false);
+    const handleScroll = () => {
+        isScrolled.value = window.scrollY > 0;
+    }
 
     const navItems = [
         { label: "首页", path: '/', icon: "zhuye" },
@@ -85,7 +117,23 @@
         { label: "关于", path: "/about", icon: "guanyu" },
         { label: "简历", path: "/cv", icon: "subway" }
     ];
-    const isDark = true;
+    
+    // 监听滚动事件
+    onMounted(() => {
+        handleScroll();
+        window.addEventListener('scroll', handleScroll);
+    });
+
+    onUnmounted(() => {
+        window.removeEventListener('scroll', handleScroll);
+    });
+
+    const headerClass = computed(() => {
+        return {
+            "scrolled": isScrolled.value,
+            "dark": isDark.value
+        }
+    });
 </script>
 
 <style scoped>
@@ -105,6 +153,16 @@
         border-bottom: none;
         transition: background .3s, box-shadow .3s;
     }
+    .site-header.scrolled {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+    }
+    .site-header.dark.scrolled {
+        background: rgba(35, 35, 35, 0.95);
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+    }
+
     .header-inner {
         max-width: 1200px;
         margin: 0 auto;
@@ -197,16 +255,45 @@
     .nav-link.router-link-active {
         color: rgba(255, 255, 255, .9);
     }
+    
+    .site-header.scrolled .site-logo,
+    .site-header.scrolled .nav-link,
+    .site-header.scrolled .theme-toggle,
+    .site-header.scrolled .search-toggle {
+        color: var(--blog-text);
+        text-shadow: none;
+    }
+    .site-header.scrolled .nav-link:hover {
+        color: var(--blog-text);
+        background: var(--blog-hover);
+    }
 
     .site-main {
         flex: 1;
         width: 100%;
+        background: var(--blog-bg);
     }
 
     .site-footer {
         padding: 24px 32px;
-        border-top: 1px solid #e5e7eb;
-        color: #6b7280;
+        border-top: 1px solid var(--blog-border);
+        color: var(--blog-text3);
         text-align: center;
+    }
+
+    /* 路由过渡动画 */
+    .site-main-enter-active,
+    .site-main-leave-active {
+        transition: 
+            opacity .3s ease,
+            transform .3s ease;
+    }
+    .site-main-enter-from {
+        transform: translateY(12px);
+        opacity: 0;
+    }
+    .site-main-leave-to {
+        transform: translateY(-8px);
+        opacity: 0;
     }
 </style>

@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const requset = axios.create({
+const request = axios.create({
     baseURL: "/api",
     timeout: 15000
 });
 
-requset.interceptors.response.use(
+request.interceptors.response.use(
     (response) => {
         const data = response.data;
         if (data?.code === 1) {
@@ -15,8 +15,8 @@ requset.interceptors.response.use(
         return Promise.reject(data);
     },
     (error) => {
-        Promise.reject(error);
+        return Promise.reject(error);
     }
 );
 
-export default requset;
+export default request;

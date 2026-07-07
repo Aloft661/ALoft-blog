@@ -1,7 +1,7 @@
-import requset from "@/utils/request";
+import request from "@/utils/request";
 
 export function getArticlePage(params) {
-    return requset({
+    return request({
         url: "/blog/article/page",
         method: "GET",
         params
@@ -9,7 +9,7 @@ export function getArticlePage(params) {
 }
 
 export function getArticleDetail(id) {
-    return requset({
+    return request({
         url: `/blog/article/${id}`,
         method: "GET",
     });
