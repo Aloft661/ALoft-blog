@@ -3,17 +3,15 @@
         <div class="overlay"></div>
         <div class="fade"></div>
         <div class="content">
-            <h1 class="title"></h1>
-            <p class="desc">四处逛逛，发现一些新的大陆——特别的想法、新的感触和一段不一样的经历</p>
+            <h1 class="title">{{ title }}</h1>
+            <p class="desc">{{ desc }}</p>
         </div>
     </div>
 </template>
 
 <script setup>
     import bgcImg from "@/assets/images/bgc.webp";
-
     import { computed } from "vue";
-    import { useRoute } from "vue-router";
 
     const props = defineProps({
         // 文章封面
@@ -25,7 +23,7 @@
             type: String,
             default: ""
         },
-        meta: {
+        desc: {
             type: String,
             default: ""
         }
@@ -36,6 +34,13 @@
             return props.coverImage;
         }
         return bgcImg
+    });
+
+    const title = computed(() => {
+        if (props.title) {
+            return props.title;
+        }
+        return "ALoft";
     })
 </script>
 
@@ -56,7 +61,7 @@
     .overlay {
         position: absolute;
         inset: 0;
-        background: rgba(0, 0, 0, .35);
+        background: #00000059;
         z-index: 1;
     }
     .fade {
@@ -65,7 +70,7 @@
         left: 0;
         right: 0;
         height: 80px;
-        background: linear-gradient(to bottom, transparent, #181818);
+        background: linear-gradient(to bottom, transparent, var(--blog-bg));
         z-index: 2;
         pointer-events: none;
     }
@@ -78,17 +83,22 @@
         max-width: 600px;
     }
     .title {
-        font-size: 34px;
+        font-family: var(--blog-serif);
+        font-size: 30px;
         font-weight: 800;
         margin: 0 0 10px;
         text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-        letter-spacing: 1px;
+        line-height: 1.35;
     }
     .desc {
-        font-size: 16px;
+        font-size: 14px;
         margin: 0;
-        opacity: .9;
+        opacity: .85;
         text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-        line-height: 1.6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 4px 5px;
     }
 </style>

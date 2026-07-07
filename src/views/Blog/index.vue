@@ -1,14 +1,24 @@
 <template>
     <section class="blog-container">
-        <h1>博客</h1>
+        <div class="blog-content">
+            <div class="blog-left">
+                <List :articles="articles" />
+            </div>
+            <div class="blog-right">
+                <UserCard />
+            </div>
+        </div>
     </section>
 </template>
 
 <script setup>
+    import List from "@/components/List.vue";
+    import UserCard from "@/components/UserCard.vue";
+
     import { onMounted, ref } from "vue";
     import { getArticlePage } from "@/api/article";
 
-    const articles = ref([]);
+    const articles = ref({});
     
     const fetchAricles = async () => {
         try {
@@ -16,7 +26,7 @@
                 page: 1,
                 pageSize: 10
             });
-            console.log(data);
+            articles.value = data;
         } catch (e) {
             console.log(e);
         }
@@ -27,10 +37,26 @@
     });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
     .blog-container {
-        max-width: 1080px;
+        max-width: 1200px;
         margin: 0 auto;
-        padding: 48px 24px;
+        padding: 32px 28px;
+    }
+    .blog-content {
+        display: flex;
+        align-items: flex-start;
+        width: 100%;
+        gap: 24px;
+        .blog-left {
+            flex: 1;
+            min-width: 0;
+        }
+        .blog-right {
+            width: 280px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 74px;
+        }
     }
 </style>
